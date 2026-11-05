@@ -3,6 +3,7 @@
 @font-face{font-family:IN;src:url(f/inter-400.woff2) format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:IN;src:url(f/inter-500.woff2) format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:IN;src:url(f/inter-600.woff2) format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:VT;src:url(f/vt323.woff2) format('woff2');font-display:swap}
 @font-face{font-family:JB;src:url(f/jbmono.woff2) format('woff2');font-weight:100 800;font-display:swap}
 :root{
   --bg:#03161d; --bg2:#052127; --bg3:#072b31; --line:rgba(95,245,228,.12); --line2:rgba(95,245,228,.22);
@@ -237,7 +238,7 @@ input.wide{margin-top:26px}
 /* ---------------------------------------------------------------- boot terminal (intro) */
 #intro .crt{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 4px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55));z-index:2;transition:opacity .6s}
 #intro.open .crt{opacity:0}
-.boot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,88vw);margin:0;font:500 15px/1.75 JB,monospace;color:var(--t2);white-space:pre-wrap;z-index:1;transition:opacity .4s,transform .6s var(--ease);text-shadow:0 0 8px rgba(95,245,228,.25)}
+.boot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,90vw);margin:0;font:400 22px/1.45 VT,JB,monospace;color:var(--t2);white-space:pre-wrap;z-index:1;transition:opacity .4s,transform .6s var(--ease);text-shadow:0 0 8px rgba(95,245,228,.25)}
 .boot .ok{color:var(--c)}.boot .dim{color:var(--t3)}.boot .hd{color:var(--t);font-weight:700}
 .boot .cur{display:inline-block;width:.6em;height:1.1em;background:var(--c);vertical-align:-2px;animation:blink 1s steps(1) infinite;box-shadow:0 0 10px var(--c)}
 @keyframes blink{50%{opacity:0}}
@@ -270,11 +271,11 @@ code{font:500 .9em JB;color:var(--c);background:rgba(95,245,228,.08);padding:2px
 .term{height:460px;display:flex;flex-direction:column;transition:box-shadow .3s}
 .term.rv{margin-top:0}
 .term .wbar .tpop{margin-left:auto;background:none;border:0;color:var(--t3);font:600 16px JB;cursor:pointer;padding:4px 6px;border-radius:6px}.term .wbar .tpop:hover{color:var(--c);background:rgba(95,245,228,.08)}
-.tout{flex:1;overflow:auto;padding:18px 20px 6px;font:500 14px/1.65 JB,monospace;color:var(--t2);white-space:pre-wrap;word-break:break-word;scrollbar-width:thin;scrollbar-color:var(--c3) transparent}
+.tout{flex:1;overflow:auto;padding:16px 20px 6px;font:400 19px/1.35 VT,JB,monospace;text-shadow:0 0 6px rgba(95,245,228,.18);color:var(--t2);white-space:pre-wrap;word-break:break-word;scrollbar-width:thin;scrollbar-color:var(--c3) transparent}
 .tout .c{color:var(--c)}.tout .m{color:var(--t3)}.tout .e{color:#ff8b7e}.tout .w{color:var(--t)}.tout .cmd{color:var(--t)}.tout a{color:var(--c)}
 .tin{display:flex;align-items:center;gap:10px;padding:12px 20px 16px;border-top:1px solid var(--line)}
-.tps{font:600 14px JB;color:var(--c);white-space:nowrap}
-.tin input{flex:1;background:none;border:0;outline:none;color:var(--t);font:500 14px JB;caret-color:var(--c)}
+.tps{font:400 20px VT,JB;color:var(--c);white-space:nowrap;text-shadow:0 0 8px rgba(95,245,228,.5)}
+.tin input{flex:1;background:none;border:0;outline:none;color:var(--t);font:400 20px VT,JB;caret-color:var(--c)}
 .term::after{content:'';position:absolute;inset:40px 0 0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px)}
 .term.float{background:rgba(3,18,23,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:fixed;right:22px;bottom:86px;width:min(620px,calc(100vw - 32px));height:min(460px,70vh);z-index:80;opacity:1!important;transform:none!important;transition:none;animation:pop .35s var(--ease)}
 @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.98)}}
