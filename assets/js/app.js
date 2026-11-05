@@ -222,6 +222,9 @@ const CMDS = {
   <span class="c">floors</span>                  every floor and its numbers
   <span class="c">curve</span>                   draw the curve for your start
   <span class="c">snipe</span> [sol] [bots]      what a bundle buys, standard vs yours
+  <span class="c">quote</span> [sol]             what that much SOL buys at your start
+  <span class="c">at</span> [percent]            market cap when the curve is that full
+  <span class="c">compare</span> 5k 100k          two starts side by side
   <span class="c">price</span>                   live SOL price
   <span class="c">raydium</span>                 LaunchLab program, config and platform, live
   <span class="c">coins</span>                   every coin launched on fl00r
@@ -234,6 +237,9 @@ const CMDS = {
   floors: () => P(`<span class="m">${pad('start', 10)}${pad('raise', 14)}${pad('fills at', 11)}1 SOL buys</span>\n` + floorsSol().map(M => `${Math.abs(M - S.start) / S.start < .01 ? '<span class="c">' : ''}${pad(usd(M), 10)}${pad(sol(M * RAISE_K), 14)}${pad(usd(M * FILL_K), 11)}${pct(buyShare(M, 1))}${Math.abs(M - S.start) / S.start < .01 ? '  ◂ yours</span>' : ''}`).join('\n')),
   curve: () => P(asciiCurve(S.start)),
   snipe: a => { const b = +a[0] || 1, n = Math.max(1, Math.round(+a[1] || 10)), t = b * n, x = stdShare(t), y = buyShare(S.start, t); const bar = v => '█'.repeat(Math.max(1, Math.round(v * 60))); P(`${n} × ${b} SOL in the first block\nstandard ${pad(usd(STD_START), 9)} <span class="e">${bar(x)}</span> ${pct(x)}\nyours    ${pad(usd(S.start), 9)} <span class="c">${bar(y)}</span> ${pct(y)}\n<span class="m">${x / y >= 1.05 ? (x / y).toFixed(1) + '× less at your start' : 'about the same as standard'}. before fees.</span>`); },
+  quote: a => { const x = +a[0] || 1, sh = buyShare(S.start, x); P(`${x} SOL at a ${usd(S.start)} start buys about <span class="c">${Math.round(sh * SUPPLY).toLocaleString('en-US')}</span> tokens (${pct(sh)} of supply)\n<span class="m">the same ${x} SOL at a standard start: ${pct(stdShare(x))}. before fees.</span>`); },
+  at: a => { const f = Math.max(0, Math.min(100, parseFloat(a[0]) || 50)) / 100, vs = vSol(S.start), k = vs * VTOK, sold = VTOK - SELL * f; P(`${(f * 100).toFixed(0)}% of the curve sold → market cap <span class="c">${usd(SUPPLY * k / (sold * sold))}</span>, ${sol(k / sold - vs)} raised`); },
+  compare: a => { const xs = a.map(parseAmt).filter(Boolean); if (xs.length < 2) return P('usage: <span class="c">compare 5k 100k</span>', 'e'); P(`<span class="m">${pad('start', 10)}${pad('raise', 14)}${pad('fills at', 11)}1 SOL buys</span>\n` + xs.map(M => `${pad(usd(M), 10)}${pad(sol(M * RAISE_K), 14)}${pad(usd(M * FILL_K), 11)}${pct(buyShare(M, 1))}`).join('\n')); },
   price: () => P(S.sol ? `SOL <span class="w">$${S.sol.toFixed(2)}</span> <span class="m">· Jupiter price, read by the fl00r API</span>` : 'price unavailable right now', S.sol ? '' : 'e'),
   raydium: () => { const s = S.status; if (!s) return P('LaunchLab is unreachable right now. try again in a minute.', 'e');
     P(`program ...... <a href="https://solscan.io/account/${s.program}" target="_blank" rel="noopener">${s.program}</a>\nconfig ....... ${s.config}\nplatform ..... ${s.platform}${s.platformName ? ' <span class="m">(' + esc(s.platformName) + ')</span>' : ''}\nmin raise .... ${s.minRaiseSol} SOL <span class="m">→ lowest start ${sol(s.minStartSol)}</span>\ntrade fee .... ${s.tradeFeePct}%${s.platformFeePct != null ? ' <span class="m">+ platform ' + s.platformFeePct + '%</span>' : ''}\n${s.lpRule ? esc(s.lpRule) + '\n' : ''}tag .......... ${s.tag}`); },
