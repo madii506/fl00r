@@ -190,15 +190,44 @@ form.addEventListener('submit', async e => {
 });
 
 // ---------------------------------------------------------------- motion
-// marine snow and bubbles drifting up through the hero
-(() => { const c = $('#snow'); if (!c || RM) return; const g = c.getContext('2d'); let W, H, P = [];
-  const size = () => { const r = c.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; c.width = W * d; c.height = H * d; g.setTransform(d, 0, 0, d, 0, 0); P = Array.from({ length: Math.round(W * H / 9000) }, () => ({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.6 + .4, v: Math.random() * .25 + .05, a: Math.random() * .5 + .15, b: Math.random() < .06, p: Math.random() * 6 })); };
-  size(); addEventListener('resize', size); let on = true; new IntersectionObserver(e => on = e[0].isIntersecting).observe(c);
-  const tick = t => { if (on) { g.clearRect(0, 0, W, H); for (const s of P) { s.y -= s.b ? s.v * 3 : s.v; s.x += Math.sin(t / 1600 + s.p) * (s.b ? .35 : .12); if (s.y < -10) { s.y = H + 10; s.x = Math.random() * W; }
-      g.beginPath(); g.arc(s.x, s.y, s.b ? s.r * 3 : s.r, 0, 7); if (s.b) { g.strokeStyle = `rgba(160,250,240,${s.a})`; g.lineWidth = 1; g.stroke(); } else { g.fillStyle = `rgba(207,238,233,${s.a})`; g.fill(); } } }
-    requestAnimationFrame(tick); }; requestAnimationFrame(tick); })();
-// a soft light that follows the cursor in the hero
-(() => { const h = $('.hero'), s = $('#spot'); if (!h || RM) return; h.addEventListener('pointermove', e => { const r = h.getBoundingClientRect(); s.style.left = (e.clientX - r.left) + 'px'; s.style.top = (e.clientY - r.top) + 'px'; }); })();
+// one sea behind the whole page: marine snow in three depths that sinks past you as you scroll,
+// bubbles rising, flakes that part around the cursor, and a burst of bubbles where you click
+(() => {
+  const c = $('#snow'), spot = $('#spot'); if (!c) return; const g = c.getContext('2d'); let W, H, P = [], B = [];
+  const mouse = { x: -9999, y: -9999 }; let lastY = scrollY, vel = 0, t0 = performance.now();
+  const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; c.width = W * d; c.height = H * d; g.setTransform(d, 0, 0, d, 0, 0);
+    P = Array.from({ length: Math.min(260, Math.round(W * H / 6500)) }, () => { const z = Math.random(); return { x: Math.random() * W, y: Math.random() * H, z, r: .5 + z * 1.8, a: .12 + z * .45, ox: 0, oy: 0, p: Math.random() * 6.3 }; }); };
+  size(); addEventListener('resize', size);
+  addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; document.body.classList.add('moved'); if (spot) { spot.style.left = e.clientX + 'px'; spot.style.top = e.clientY + 'px'; } }, { passive: true });
+  addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+  addEventListener('pointerdown', e => { if (RM || e.target.closest('input,textarea,button,a,canvas#cvs,.term,.tower')) return; for (let i = 0; i < 14; i++) B.push({ x: e.clientX + (Math.random() - .5) * 30, y: e.clientY + (Math.random() - .5) * 20, r: 2 + Math.random() * 6, v: .6 + Math.random() * 1.6, w: Math.random() * 6.3, a: .7 }); }, { passive: true });
+  const sy = () => { const h = document.documentElement, m = h.scrollHeight - h.clientHeight; document.documentElement.style.setProperty('--sy', (m > 0 ? h.scrollTop / m : 0).toFixed(4)); };
+  addEventListener('scroll', sy, { passive: true }); sy();
+  if (RM) return;
+  for (let i = 0; i < 10; i++) B.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: 1.5 + Math.random() * 4, v: .3 + Math.random() * .8, w: Math.random() * 6.3, a: .45, loop: true });
+  let hidden = false; document.addEventListener('visibilitychange', () => hidden = document.hidden);
+  const tick = now => {
+    requestAnimationFrame(tick); if (hidden) return; const dt = Math.min(50, now - t0) / 16.7; t0 = now;
+    const dy = scrollY - lastY; lastY = scrollY; vel += (dy - vel) * .15;
+    g.clearRect(0, 0, W, H);
+    for (const s of P) {
+      // drift, sink with the scroll at a speed set by depth, sway
+      s.y += (-.12 - s.z * .18) * dt - vel * (.15 + s.z * .55); s.x += Math.sin(now / 2400 + s.p) * .12 * dt;
+      if (s.y < -10) { s.y = H + 10; s.x = Math.random() * W; } if (s.y > H + 10) { s.y = -10; s.x = Math.random() * W; }
+      // part around the cursor
+      const dx = s.x + s.ox - mouse.x, dy2 = s.y + s.oy - mouse.y, d2 = dx * dx + dy2 * dy2, R = 130;
+      if (d2 < R * R) { const d = Math.sqrt(d2) || 1, f = (1 - d / R) * 22 * (.4 + s.z); s.ox += (dx / d * f - s.ox) * .12; s.oy += (dy2 / d * f - s.oy) * .12; } else { s.ox *= .94; s.oy *= .94; }
+      const stretch = Math.min(6, Math.abs(vel) * (.2 + s.z));
+      g.fillStyle = `rgba(207,238,233,${s.a})`; g.beginPath();
+      if (stretch > .8) g.ellipse(s.x + s.ox, s.y + s.oy, s.r, s.r + stretch, 0, 0, 7); else g.arc(s.x + s.ox, s.y + s.oy, s.r, 0, 7); g.fill();
+    }
+    for (let i = B.length - 1; i >= 0; i--) { const b = B[i]; b.y -= b.v * dt; b.x += Math.sin(now / 500 + b.w) * .5; if (!b.loop) b.a -= .004 * dt;
+      if (b.loop && b.y < -20) { b.y = H + 20; b.x = Math.random() * W; } if (!b.loop && (b.a <= 0 || b.y < -20)) { B.splice(i, 1); continue; }
+      g.strokeStyle = `rgba(160,250,240,${b.a})`; g.lineWidth = 1.2; g.beginPath(); g.arc(b.x, b.y, b.r, 0, 7); g.stroke();
+      g.fillStyle = `rgba(230,255,252,${b.a * .6})`; g.beginPath(); g.arc(b.x - b.r * .35, b.y - b.r * .35, b.r * .25, 0, 7); g.fill(); }
+  };
+  requestAnimationFrame(tick);
+})();
 // headings rise in word by word
 $$('h2').forEach(h => { h.classList.add('split'); h.innerHTML = h.innerHTML.split(/(\s+)/).map(w => /^\s+$/.test(w) ? w : `<span class="w"><span>${w}</span></span>`).join(''); h.querySelectorAll('.w>span').forEach((s, i) => s.style.transitionDelay = (i * 55) + 'ms'); });
 $$('.kicker').forEach(k => io.observe(k));
