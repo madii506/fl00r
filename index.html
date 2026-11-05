@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fl00r · launch a coin on Raydium at any market cap</title>
+<meta name="description" content="pick your fl00r. launch a coin on Raydium LaunchLab at any starting market cap. it fills at 5× its start and graduates into a Raydium pool.">
+<meta property="og:title" content="fl00r · pick your fl00r">
+<meta property="og:description" content="launch a coin on Raydium at any market cap.">
+<meta property="og:image" content="/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/icon.png">
+<link rel="preload" href="/assets/f/interd-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css?v=2">
+</head>
+<body class="booting">
+
+<!-- intro: a terminal boots, the floors build, the coin lands, the doors open -->
+<div id="intro" aria-hidden="true">
+  <div class="door l"></div><div class="door r"></div>
+  <div class="crt"></div>
+  <pre class="boot" id="boot"></pre>
+  <div class="ib">
+    <svg class="imark" viewBox="0 0 400 400" width="150" height="150">
+      <line class="f1" x1="104" y1="288" x2="196" y2="288"/>
+      <line class="f2" x1="154" y1="218" x2="246" y2="218"/>
+      <line class="f3" x1="204" y1="148" x2="296" y2="148"/>
+      <circle class="coin" cx="276" cy="105" r="18"/>
+    </svg>
+    <div class="iword"><span>f</span><span>l</span><b>0</b><b>0</b><span>r</span></div>
+    <div class="itag">launch a coin on <b>Raydium</b> at any market cap</div>
+  </div>
+  <button class="skip" type="button">skip ›</button>
+</div>
+
+<div id="prog"></div>
+<header id="nav">
+  <a class="brand" href="#top" aria-label="fl00r">
+    <svg viewBox="0 0 400 400" width="30" height="30"><line x1="104" y1="288" x2="196" y2="288" class="d2"/><line x1="154" y1="218" x2="246" y2="218" class="d1"/><line x1="204" y1="148" x2="296" y2="148" class="c"/><circle cx="276" cy="105" r="18" class="cc"/></svg>
+    <span>fl00r</span>
+  </a>
+  <nav>
+    <a href="#why">why</a><a href="#term">terminal</a><a href="#how">how it works</a><a href="#bots">snipers</a><a href="#curve">curve</a><a href="#raydium">Raydium</a><a href="#coins">coins</a>
+  </nav>
+  <a class="btn sm" href="#launch">launch a coin</a>
+</header>
+
+<main id="top">
+  <!-- hero -->
+  <section class="hero">
+    <div class="sea" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="wrap hgrid">
+      <div class="hl">
+        <div class="chip"><span class="dot"></span>built on Raydium LaunchLab</div>
+        <h1>pick your <em>fl00r.</em></h1>
+        <p class="lead">launch a coin on Raydium at any market cap. you choose where it starts, from about <b data-k="minUsd">$2K</b> to <b data-k="maxUsd">$4.7M</b>. it fills at 5× its start and graduates straight into a Raydium pool.</p>
+        <div class="ctas"><a class="btn" href="#launch">launch a coin</a><a class="btn ghost" href="#how">how it works</a></div>
+        <div class="hstats">
+          <div><small>SOL</small><b id="solPx">—</b></div>
+          <div><small>LaunchLab</small><b id="llState">checking…</b></div>
+          <div><small>fl00r coins</small><b id="coinCount">—</b></div>
+        </div>
+      </div>
+      <div class="hr">
+        <div class="tower" id="tower" role="radiogroup" aria-label="pick a starting market cap"></div>
+        <div class="readout" id="heroRead"></div>
+      </div>
+    </div>
+    <a class="down" href="#problem" aria-label="scroll"><span></span></a>
+  </section>
+
+  <!-- why -->
+  <section id="why" class="band">
+    <div class="wrap">
+      <p class="kicker rv">why</p>
+      <h2 class="rv">the start is the whole game.</h2>
+      <div class="essay">
+        <p class="rv">on almost every launchpad, every coin is born the same way. the same tiny market cap, the same curve, the same graduation point. a joke coin and a real project get the exact same first block, and that first block is where most of the damage happens.</p>
+        <p class="rv">at a tiny start, the price is so low that one fast wallet can buy a huge piece of the supply before a person has even seen the chart. bundles of bots do it every block. by the time the first real buyer arrives, a third of the coin can already be in a handful of wallets waiting to sell.</p>
+        <p class="rv">fl00r changes one number: where your coin starts. pick a higher floor and the same SOL buys a smaller, fairer slice. nothing else about the coin changes. the supply is the same, the curve shape is the same, and it still graduates straight into a Raydium pool when it fills.</p>
+      </div>
+      <div class="duo">
+        <div class="dcard rv"><span class="tagc">for creators</span><h3>start where your coin belongs.</h3><ul><li>pick any opening market cap, from about <b data-k="minUsd">$2K</b> up</li><li>launch on Raydium LaunchLab from your own wallet</li><li>no presale, no team allocation, no extra cost for a deeper start</li><li>graduates into a Raydium CPMM pool at the curve's last price</li></ul></div>
+        <div class="dcard rv"><span class="tagc">for traders</span><h3>know the curve before you buy.</h3><ul><li>every coin's start, raise target and fill point are on-chain</li><li>the same shape at every size: it always fills at 5× its start</li><li>deeper starts are harder for bots to corner in the first block</li><li>trade it on Raydium the whole way, curve and pool</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- terminal -->
+  <section id="term" class="band alt">
+    <div class="wrap">
+      <p class="kicker rv">terminal</p>
+      <h2 class="rv">drive it from the keyboard.</h2>
+      <p class="sub rv">everything on this page also works as commands. type <code>help</code>, or open the terminal from anywhere with <code>/</code> or the button in the corner.</p>
+      <div class="tslot" id="tslot">
+        <div class="win term rv" id="termWin">
+          <div class="wbar"><i></i><i></i><i></i><span>fl00r@raydium:~</span><button type="button" class="tpop" id="tPop" title="pop out">⤢</button></div>
+          <div class="tout" id="tOut"></div>
+          <form class="tin" id="tIn" autocomplete="off"><span class="tps">fl00r ▸</span><input id="tCmd" spellcheck="false" autocapitalize="off" aria-label="terminal command" placeholder="type help"></form>
+        </div>
+      </div>
+      <div class="tchips rv" id="tChips"></div>
+    </div>
+  </section>
+
+  <!-- the problem -->
+  <section id="problem" class="band">
+    <div class="wrap">
+      <p class="kicker rv">the problem</p>
+      <h2 class="rv">every launchpad starts every coin on the same floor.</h2>
+      <div class="pgrid">
+        <div class="pcard rv"><span class="big">$2.6K</span><p>where a standard launchpad curve opens, no matter what you launch.</p></div>
+        <div class="pcard rv"><span class="big" id="p1">3.4%</span><p>of the supply that <b>1 SOL</b> buys in the first block at that start.</p></div>
+        <div class="pcard rv"><span class="big" id="p10">27.6%</span><p>taken by a bundle of ten 1 SOL bots before anyone has seen the chart.</p></div>
+      </div>
+      <div class="supply rv" aria-hidden="true"><div class="sb"><i id="botFill"></i></div><div class="sl"><span>bots</span><span>everyone else</span></div></div>
+    </div>
+  </section>
+
+  <!-- how it works: sticky, driven by scroll -->
+  <section id="how" class="how">
+    <div class="wrap hw">
+      <div class="stick">
+        <div class="shaft" id="shaft">
+          <div class="rail"></div>
+          <div class="lvls" id="lvls"></div>
+          <div class="car" id="car"><span></span></div>
+        </div>
+        <div class="stepnum"><b id="stepN">01</b><span>/ 04</span></div>
+      </div>
+      <div class="steps">
+        <p class="kicker">how it works</p>
+        <article class="step" data-i="0"><span>01</span><h3>pick your fl00r</h3><p>choose the opening market cap, from about <b data-k="minUsd">$2K</b> up to millions. the supply is fixed at 1,000,000,000 and the curve shape is the same at every size. a deeper start is just a bigger market cap, not money anyone puts in.</p></article>
+        <article class="step" data-i="1"><span>02</span><h3>it trades on its own curve</h3><p>your coin launches on Raydium LaunchLab with a constant-product curve built from your start. 690,983,005 tokens (69.1%) are sold on the curve. people buy and sell on it from the first second.</p></article>
+        <article class="step" data-i="2"><span>03</span><h3>it fills at 5×</h3><p>the curve's last price is exactly 5× its first. it fills after raising about <b>1.55×</b> your opening market cap. start at $20K and it fills around $100K.</p></article>
+        <article class="step" data-i="3"><span>04</span><h3>it graduates into Raydium</h3><p>when the last curve token sells, LaunchLab moves the raised SOL and the other 309,016,995 tokens into a Raydium CPMM pool at the curve's last price. no jump, no gap to snipe. from there it trades on Raydium like any other pair.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- snipers -->
+  <section id="bots" class="band">
+    <div class="wrap">
+      <p class="kicker rv">snipers</p>
+      <h2 class="rv">start deeper. the first block gets less.</h2>
+      <div class="win rv"><div class="wbar"><i></i><i></i><i></i><span>fl00r://snipe.exe</span></div><div class="calc">
+        <div class="ctrl">
+          <label>SOL per bot <b id="bSolV">1</b></label><input type="range" id="bSol" min="0.1" max="20" step="0.1" value="1">
+          <label>bots in the bundle <b id="bNV">10</b></label><input type="range" id="bN" min="1" max="30" step="1" value="10">
+          <label>your start <b id="bStartV">—</b></label><input type="range" id="bStart" min="0" max="1000" step="1" value="500">
+        </div>
+        <div class="cmp">
+          <div class="row"><span>standard start <small id="cStdS">~28 SOL</small></span><div class="bar"><i id="cStd"></i></div><b id="cStdV">—</b></div>
+          <div class="row you"><span>your fl00r <small id="cYouS">—</small></span><div class="bar"><i id="cYou"></i></div><b id="cYouV">—</b></div>
+          <p class="note" id="cNote">share of the whole supply the bundle buys in the first block, before fees.</p>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- the curve -->
+  <section id="curve" class="band alt">
+    <div class="wrap">
+      <p class="kicker rv">the curve</p>
+      <h2 class="rv">the same shape at every size.</h2>
+      <div class="cv rv">
+        <div class="chart win"><div class="wbar"><i></i><i></i><i></i><span>fl00r://curve.exe · hover the line</span></div><canvas id="cvs" width="900" height="420"></canvas><div class="tip" id="tip"></div></div>
+        <div class="facts" id="facts"></div>
+      </div>
+      <input type="range" id="cStart" min="0" max="1000" step="1" value="500" aria-label="starting market cap" class="wide">
+    </div>
+  </section>
+
+  <!-- numbers -->
+  <section id="numbers" class="band">
+    <div class="wrap">
+      <p class="kicker rv">the numbers</p>
+      <h2 class="rv">every floor, side by side.</h2>
+      <div class="win rv"><div class="wbar"><i></i><i></i><i></i><span>fl00r://floors.db</span></div><div class="tbl"><table id="ntable"><thead><tr><th>start</th><th>in SOL</th><th>raise to fill</th><th>fills at</th><th>1 SOL buys</th><th>10 × 1 SOL bots</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="math rv">
+        <div><h4>the curve</h4><p>constant product, run by LaunchLab: <code>x · y = k</code>. the curve starts with <code>1.25 × start</code> virtual SOL against <code>1,250,000,000</code> virtual tokens.</p></div>
+        <div><h4>the fill</h4><p>it sells <code>690,983,005</code> tokens. after that the price is <code>(1.25 / 0.559)² = 5×</code> the first. the raise target is <code>1.545 × start</code>.</p></div>
+        <div><h4>the pool</h4><p>the raised SOL and the other <code>309,016,995</code> tokens open a Raydium CPMM pool at exactly the curve's last price, so there's no jump at graduation.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- raydium -->
+  <section id="raydium" class="band">
+    <div class="wrap">
+      <p class="kicker rv">Raydium</p>
+      <h2 class="rv">launched on Raydium. graduates on Raydium.</h2>
+      <div class="rgrid">
+        <div class="rcard rv"><h4>Raydium LaunchLab</h4><p>every fl00r coin is created by Raydium's own launch program. fl00r only picks the curve's numbers from your start; LaunchLab runs the curve, the trades and the graduation on-chain.</p><a id="progLink" target="_blank" rel="noopener" href="https://solscan.io/account/LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj">LanMV9s…J3uj ↗</a></div>
+        <div class="rcard rv"><h4>a Raydium pool at the end</h4><p>when the curve fills, the liquidity migrates into a Raydium CPMM pool at the curve's last price. the pool's LP follows LaunchLab's migration rules for the platform the coin was launched on.</p><span class="mono" id="lpRule">reading the platform…</span></div>
+        <div class="rcard rv"><h4>your keys, your wallet</h4><p>the server builds the LaunchLab transaction; your wallet signs and sends it. fl00r never holds your SOL or your coin. a 0-SOL note to the fl00r tag address is how the coin list finds fl00r launches on-chain.</p><span class="mono" id="tagAddr">—</span></div>
+      </div>
+      <p class="indep rv">fl00r is independent and not affiliated with Raydium. it's a front end that uses Raydium's public LaunchLab program.</p>
+    </div>
+  </section>
+
+  <!-- launch -->
+  <section id="launch" class="band alt">
+    <div class="wrap">
+      <p class="kicker rv">launch</p>
+      <h2 class="rv">launch a coin on your fl00r.</h2>
+      <div class="lgrid">
+        <form id="lform" class="lform win rv" autocomplete="off"><div class="wbar"><i></i><i></i><i></i><span>fl00r://launch.exe · Raydium LaunchLab</span></div>
+          <div class="two"><label>name<input name="name" maxlength="32" placeholder="my coin" required></label><label>ticker<input name="symbol" maxlength="10" placeholder="COIN" required></label></div>
+          <label>image link<input name="image" type="url" placeholder="https://…/coin.png" required></label>
+          <label>description <small>optional</small><textarea name="desc" maxlength="240" rows="2" placeholder="what it is"></textarea></label>
+          <div class="two"><label>X link <small>optional</small><input name="twitter" type="url" placeholder="https://x.com/…"></label><label>website <small>optional</small><input name="website" type="url" placeholder="https://…"></label></div>
+          <label>starting market cap <b id="lStartV">—</b></label>
+          <input type="range" id="lStart" min="0" max="1000" step="1" value="500">
+          <div class="lnums" id="lNums"></div>
+          <label>first buy <small>optional, in SOL, made in the same transaction</small><input name="buy" type="number" min="0" step="0.01" value="0"></label>
+          <div class="wl"><button type="button" class="btn ghost" id="wBtn">connect wallet</button><span id="wAddr" class="mono"></span></div>
+          <button type="submit" class="btn wide" id="goBtn" disabled>connect a wallet to launch</button>
+          <div class="lstat" id="lStat" role="status"></div>
+        </form>
+        <div class="preview rv">
+          <div class="pcoin" id="pCoin">
+            <div class="pimg"><img id="pImg" alt=""><span id="pImgPh">image</span></div>
+            <div class="pt"><b id="pName">my coin</b><span id="pSym">$COIN</span></div>
+            <div class="pbar"><i></i></div>
+            <div class="pkv"><span>starts at</span><b id="pStart">—</b></div>
+            <div class="pkv"><span>fills at</span><b id="pFill">—</b></div>
+            <div class="pkv"><span>graduates to</span><b>Raydium CPMM</b></div>
+          </div>
+          <p class="pnote">what your coin will look like in the list. nothing is sent until you sign in your wallet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- coins -->
+  <section id="coins" class="band">
+    <div class="wrap">
+      <p class="kicker rv">coins</p>
+      <h2 class="rv">every coin launched on fl00r.</h2>
+      <div class="cgrid" id="cgrid"><div class="empty">reading the chain…</div></div>
+    </div>
+  </section>
+
+  <!-- faq -->
+  <section id="faq" class="band alt">
+    <div class="wrap narrow">
+      <p class="kicker rv">faq</p>
+      <h2 class="rv">questions.</h2>
+      <div class="faq">
+        <details class="rv"><summary>is this Raydium?</summary><p>no. fl00r is an independent front end. the coins are created by Raydium's public LaunchLab program, trade on its curve and graduate into a Raydium pool. fl00r isn't affiliated with Raydium.</p></details>
+        <details class="rv"><summary>does a deeper start cost me more?</summary><p>no. the starting market cap is a number on the curve, not money you put in. you pay LaunchLab's normal creation cost plus any first buy you choose. the first buyers just get a smaller, fairer slice for each SOL.</p></details>
+        <details class="rv"><summary>what are the numbers?</summary><p>supply 1,000,000,000. 690,983,005 tokens (69.1%) sold on the curve, 309,016,995 (30.9%) go into the Raydium pool. the raise target is about 1.545× your opening market cap, so the curve's last price is 5× its first.</p></details>
+        <details class="rv"><summary>what are the fees?</summary><p>LaunchLab's own trading fee on the curve, read live from its config: <b id="feeLine">loading…</b>. after graduation, the Raydium pool's normal fees.</p></details>
+        <details class="rv"><summary>why is there a minimum start?</summary><p>LaunchLab has a minimum raise target per launch. fl00r turns that into the lowest start it can offer, about <b data-k="minUsd">—</b>.</p></details>
+        <details class="rv"><summary>can I still start small?</summary><p>yes. a shallow start fills fast and gives an open launch. a deep start is harder to snipe but needs more buying to fill. the site shows both before you sign.</p></details>
+        <details class="rv"><summary>where does my coin trade?</summary><p>on Raydium LaunchLab's curve from the first second, and in a Raydium CPMM pool after it graduates. it shows up on raydium.io under its mint address.</p></details>
+        <details class="rv"><summary>what's the image link for?</summary><p>the coin's metadata points at a small JSON file fl00r serves, which links your image. paste a direct link to a png, jpg or gif. keep it short: on-chain metadata links have a 200 character limit.</p></details>
+        <details class="rv"><summary>how does the coin list work?</summary><p>every launch from fl00r adds a 0-SOL transfer to a public tag address. the list reads that address's history from the chain and shows each coin's live LaunchLab pool. no database.</p></details>
+        <details class="rv"><summary>is it safe?</summary><p>memecoins are a game and most go to zero. start small. nothing here is financial advice. check every transaction in your wallet before you sign it.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap fgrid">
+    <div class="brand"><svg viewBox="0 0 400 400" width="26" height="26"><line x1="104" y1="288" x2="196" y2="288" class="d2"/><line x1="154" y1="218" x2="246" y2="218" class="d1"/><line x1="204" y1="148" x2="296" y2="148" class="c"/><circle cx="276" cy="105" r="18" class="cc"/></svg><span>fl00r</span></div>
+    <p>launch a coin on Raydium at any market cap. independent, not affiliated with Raydium. not financial advice.</p>
+    <a href="#top">back to the top ↑</a>
+  </div>
+</footer>
+
+<button type="button" id="tFab" aria-label="open the terminal">›_</button>
+<div id="toast" role="status"></div>
+<script src="/assets/js/web3.min.js"></script>
+<script src="/assets/js/app.js?v=2"></script>
+</body>
+</html>
