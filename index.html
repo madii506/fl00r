@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>fl00r · launch a coin on Raydium at any market cap</title>
+<title>fl00r</title>
 <meta name="description" content="pick your fl00r. launch a coin on Raydium LaunchLab at any starting market cap. it fills at 5× its start and graduates into a Raydium pool.">
-<meta property="og:title" content="fl00r · pick your fl00r">
+<meta property="og:title" content="fl00r">
 <meta property="og:description" content="launch a coin on Raydium at any market cap.">
 <meta property="og:image" content="/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/assets/icon.png">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="preload" href="/assets/f/interd-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/style.css?v=3">
+<link rel="stylesheet" href="/assets/style.css?v=4">
 </head>
 <body class="booting">
 
@@ -19,7 +20,6 @@
 <div id="intro" aria-hidden="true">
   <div class="door l"></div><div class="door r"></div>
   <div class="crt"></div>
-  <pre class="boot" id="boot"></pre>
   <div class="ib">
     <svg class="imark" viewBox="0 0 400 400" width="150" height="150">
       <line class="f1" x1="104" y1="288" x2="196" y2="288"/>
@@ -49,6 +49,7 @@
   <!-- hero -->
   <section class="hero">
     <div class="sea" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <canvas class="snow" id="snow" aria-hidden="true"></canvas><div class="spot" id="spot" aria-hidden="true"></div>
     <div class="wrap hgrid">
       <div class="hl">
         <div class="chip"><span class="dot"></span>built on Raydium LaunchLab</div>
@@ -68,6 +69,8 @@
     </div>
     <a class="down" href="#problem" aria-label="scroll"><span></span></a>
   </section>
+
+  <div class="ticker" aria-hidden="true"><div class="tk" id="tk"></div></div>
 
   <!-- why -->
   <section id="why" class="band">
@@ -256,7 +259,6 @@
         <details class="rv"><summary>can I still start small?</summary><p>yes. a shallow start fills fast and gives an open launch. a deep start is harder to snipe but needs more buying to fill. the site shows both before you sign.</p></details>
         <details class="rv"><summary>where does my coin trade?</summary><p>on Raydium LaunchLab's curve from the first second, and in a Raydium CPMM pool after it graduates. it shows up on raydium.io under its mint address.</p></details>
         <details class="rv"><summary>what's the image link for?</summary><p>the coin's metadata points at a small JSON file fl00r serves, which links your image. paste a direct link to a png, jpg or gif. keep it short: on-chain metadata links have a 200 character limit.</p></details>
-        <details class="rv"><summary>how does the coin list work?</summary><p>every launch from fl00r adds a 0-SOL transfer to a public tag address. the list reads that address's history from the chain and shows each coin's live LaunchLab pool. no database.</p></details>
         <details class="rv"><summary>is it safe?</summary><p>memecoins are a game and most go to zero. start small. nothing here is financial advice. check every transaction in your wallet before you sign it.</p></details>
       </div>
     </div>
@@ -274,6 +276,6 @@
 <button type="button" id="tFab" aria-label="open the terminal">›_</button>
 <div id="toast" role="status"></div>
 <script src="/assets/js/web3.min.js"></script>
-<script src="/assets/js/app.js?v=4"></script>
+<script src="/assets/js/app.js?v=5"></script>
 </body>
 </html>
