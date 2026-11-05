@@ -20,31 +20,14 @@ const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add
 
 // ---------------------------------------------------------------- intro: a terminal boots, reads LaunchLab live, then the floors build and the doors open
 const statusP = api('status'); statusP.catch(() => {});
-const intro = $('#intro'), boot = $('#boot');
-const openIntro = () => { if (intro.classList.contains('open')) return; intro.classList.add('show', 'open'); document.body.classList.remove('booting'); setTimeout(() => intro.classList.add('gone'), 1100); };
+const intro = $('#intro');
+const openIntro = () => { if (intro.classList.contains('open')) return; intro.classList.add('show', 'open'); document.body.classList.remove('booting'); setTimeout(() => document.body.classList.add('ready'), 350); setTimeout(() => intro.classList.add('gone'), 1100); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function runBoot() {
-  const live = Promise.race([statusP.then(s => s, () => null), sleep(1400).then(() => undefined)]);
-  const L = [
-    ['hd', 'FL00R OS 1.0 · a front end for Raydium LaunchLab'], ['dim', '(c) fl00r · independent · not affiliated with Raydium'], ['', ''],
-    ['', '> mounting floors ...................... ', async () => 'ok'],
-    ['', '> connecting to solana mainnet ......... ', async () => { const v = await live; return v ? 'ok' : v === null ? 'offline' : 'slow, continuing'; }],
-    ['', '> reading LaunchLab config ............. ', async () => { const v = await live; return v ? `ok · min raise ${v.minRaiseSol} SOL` : '—'; }],
-    ['', '> program LanMV9s…J3uj ................. ', async () => 'ok'],
-    ['', '> SOL price ............................ ', async () => { const v = await live; return v && v.solUsd ? '$' + v.solUsd.toFixed(2) : '—'; }],
-    ['', '> floors: $2K  $5K  $20K  $100K  $1M  $4.7M'], ['', ''], ['ok', '> pick your fl00r'],
-  ];
-  let html = '';
-  for (const [cls, text, after] of L) {
-    if (intro.classList.contains('open')) return;
-    let line = ''; for (let i = 0; i < text.length; i += 3) { line = text.slice(0, i + 3); boot.innerHTML = html + `<span class="${cls}">${esc(line)}</span><span class="cur"></span>`; await sleep(9); }
-    let tail = ''; if (after) { const r = await after(); tail = `<span class="${/ok/.test(r) ? 'ok' : 'dim'}">${esc(r)}</span>`; }
-    html += `<span class="${cls}">${esc(text)}</span>${tail}\n`; boot.innerHTML = html + '<span class="cur"></span>'; await sleep(after ? 60 : 30);
-  }
-  await sleep(380); if (intro.classList.contains('open')) return;
-  intro.classList.add('show'); await sleep(2100); openIntro();
+  await sleep(120); if (intro.classList.contains('open')) return;
+  intro.classList.add('show'); await sleep(2300); openIntro();
 }
-if (RM) { intro.classList.add('gone'); document.body.classList.remove('booting'); }
+if (RM) { intro.classList.add('gone'); document.body.classList.remove('booting', ); document.body.classList.add('ready'); }
 else { runBoot(); ['click', 'keydown', 'wheel', 'touchstart'].forEach(e => addEventListener(e, () => setTimeout(openIntro, 60), { once: true, passive: true })); }
 
 // ---------------------------------------------------------------- nav, progress, reveals, active link
@@ -206,6 +189,40 @@ form.addEventListener('submit', async e => {
   go.disabled = false;
 });
 
+// ---------------------------------------------------------------- motion
+// marine snow and bubbles drifting up through the hero
+(() => { const c = $('#snow'); if (!c || RM) return; const g = c.getContext('2d'); let W, H, P = [];
+  const size = () => { const r = c.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; c.width = W * d; c.height = H * d; g.setTransform(d, 0, 0, d, 0, 0); P = Array.from({ length: Math.round(W * H / 9000) }, () => ({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.6 + .4, v: Math.random() * .25 + .05, a: Math.random() * .5 + .15, b: Math.random() < .06, p: Math.random() * 6 })); };
+  size(); addEventListener('resize', size); let on = true; new IntersectionObserver(e => on = e[0].isIntersecting).observe(c);
+  const tick = t => { if (on) { g.clearRect(0, 0, W, H); for (const s of P) { s.y -= s.b ? s.v * 3 : s.v; s.x += Math.sin(t / 1600 + s.p) * (s.b ? .35 : .12); if (s.y < -10) { s.y = H + 10; s.x = Math.random() * W; }
+      g.beginPath(); g.arc(s.x, s.y, s.b ? s.r * 3 : s.r, 0, 7); if (s.b) { g.strokeStyle = `rgba(160,250,240,${s.a})`; g.lineWidth = 1; g.stroke(); } else { g.fillStyle = `rgba(207,238,233,${s.a})`; g.fill(); } } }
+    requestAnimationFrame(tick); }; requestAnimationFrame(tick); })();
+// a soft light that follows the cursor in the hero
+(() => { const h = $('.hero'), s = $('#spot'); if (!h || RM) return; h.addEventListener('pointermove', e => { const r = h.getBoundingClientRect(); s.style.left = (e.clientX - r.left) + 'px'; s.style.top = (e.clientY - r.top) + 'px'; }); })();
+// headings rise in word by word
+$$('h2').forEach(h => { h.classList.add('split'); h.innerHTML = h.innerHTML.split(/(\s+)/).map(w => /^\s+$/.test(w) ? w : `<span class="w"><span>${w}</span></span>`).join(''); h.querySelectorAll('.w>span').forEach((s, i) => s.style.transitionDelay = (i * 55) + 'ms'); });
+$$('.kicker').forEach(k => io.observe(k));
+$$('h2.split').forEach(h => { if (!h.classList.contains('rv')) io.observe(h); });
+// numbers count up when they come into view
+const countUp = el => { const t = el.textContent, m = t.match(/^([^\d]*)([\d.]+)(.*)$/); if (!m || RM) return; const end = +m[2], dec = (m[2].split('.')[1] || '').length, t0 = performance.now(); const f = n => { const k = Math.min(1, (n - t0) / 1100), e = 1 - Math.pow(1 - k, 3); el.textContent = m[1] + (end * e).toFixed(dec) + m[3]; if (k < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); };
+new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { countUp(e.target); o.unobserve(e.target); } }), { threshold: .6 }) && $$('.pcard .big').forEach(el => new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { countUp(e.target); o.disconnect(); } }), { threshold: .6 }).observe(el));
+// cards tilt toward the cursor
+if (!RM && matchMedia('(hover: hover)').matches) $$('.pcard, .rcard, .dcard, .math div, .pcoin').forEach(el => { el.classList.add('tilt');
+  el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; el.style.transform = `perspective(900px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg) translateY(-3px)`; });
+  el.addEventListener('pointerleave', () => el.style.transform = ''); });
+// buttons lean toward the cursor
+if (!RM && matchMedia('(hover: hover)').matches) $$('.btn').forEach(b => { b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${((e.clientX - r.left) / r.width - .5) * 8}px, ${((e.clientY - r.top) / r.height - .5) * 6 - 2}px)`; }); b.addEventListener('pointerleave', () => b.style.transform = ''); });
+// the nav pill slides to the section you're in
+(() => { const nv = $('#nav nav'); if (!nv) return; const pill = document.createElement('span'); pill.className = 'pill'; nv.prepend(pill);
+  const move = a => { if (!a) { pill.style.opacity = 0; return; } pill.style.opacity = 1; pill.style.width = a.offsetWidth + 'px'; pill.style.transform = `translateX(${a.offsetLeft}px)`; };
+  new MutationObserver(() => move(nv.querySelector('a.on'))).observe(nv, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  nv.addEventListener('pointerleave', () => move(nv.querySelector('a.on'))); $$('#nav nav a').forEach(a => a.addEventListener('pointerenter', () => move(a))); })();
+// the terminal button steps aside at the faq and footer
+(() => { const f = $('#tFab'); const o = new IntersectionObserver(es => { const any = es.some(e => e.isIntersecting); f.classList.toggle('away', any); }, { threshold: .05 }); ['#faq', '.foot'].forEach(s => $(s) && o.observe($(s))); })();
+// the ticker
+(() => { const tk = $('#tk'); if (!tk) return; const items = () => [['pick your fl00r', ''], ['launch on Raydium', ''], ...floorsSol().map(M => [usd(M), 'start']), ['fills at 5×', ''], ['graduates into a Raydium pool', ''], ['90% of the LP burned', ''], ['type / for the terminal', '']];
+  const html = () => items().map(([a, b]) => `<span>${b ? `<i>${b}</i> ` : ''}<b>${a}</b></span><span>·</span>`).join(''); tk.innerHTML = html() + html(); statusP.then(() => tk.innerHTML = html() + html(), () => {}); })();
+
 // ---------------------------------------------------------------- the fl00r terminal
 const tOut = $('#tOut'), tIn = $('#tIn'), tCmd = $('#tCmd'), tWin = $('#termWin'), hist = []; let hi = -1;
 const P = (h, cls = '') => { tOut.insertAdjacentHTML('beforeend', `<div class="${cls}">${h}</div>`); tOut.scrollTop = tOut.scrollHeight; };
@@ -248,7 +265,7 @@ const CMDS = {
   launch: a => { if (a.length < 3) { P('usage: <span class="c">launch "My Coin" TICKER https://link/to/image.png</span>\nfills the form below. you review it and sign in your wallet.'); return goTo('launch'); }
     const img = a.pop(), tk = a.pop(), nm = a.join(' ').replace(/^"|"$/g, ''); form.name.value = nm; form.symbol.value = tk.toUpperCase(); form.image.value = img; form.dispatchEvent(new Event('input')); P(`form filled: <span class="w">${esc(nm)}</span> <span class="c">$${esc(tk.toUpperCase())}</span> at ${usd(S.start)}. review it and press launch.`); goTo('launch'); },
   goto: a => { if (!goTo(a[0])) P('sections: why, term, how, bots, curve, numbers, raydium, launch, coins, faq', 'e'); },
-  intro: () => { intro.className = ''; document.body.classList.add('booting'); boot.innerHTML = ''; runBoot(); },
+  intro: () => { intro.className = ''; document.body.classList.add('booting'); runBoot(); },
   about: () => P(`<span class="w">fl00r</span>: launch a coin on Raydium at any market cap.\nyou pick the start. LaunchLab runs the curve. it fills at 5× and graduates into a Raydium pool.\n<span class="m">independent. not affiliated with Raydium. not financial advice.</span>`),
   clear: () => { tOut.innerHTML = ''; },
   history: () => P(hist.length ? hist.map((h, i) => `${pad(String(i + 1), 4)}${esc(h)}`).join('\n') : 'no history yet', 'm'),
