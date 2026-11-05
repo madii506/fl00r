@@ -66,6 +66,7 @@ async function build(req) {
   const buySol = Math.max(0, +b.buySol || 0); if (buySol > raise) throw new Error('the first buy is bigger than the whole curve');
   const mint = Keypair.generate();
   const raydium = await R.Raydium.load({ connection: conn, owner: wallet, cluster: 'mainnet', disableLoadToken: true, disableFeatureCheck: true, blockhashCommitment: 'confirmed' });
+  if (module.exports._test && module.exports._test.onLoad) module.exports._test.onLoad(raydium);
   const { transactions, extInfo } = await raydium.launchpad.createLaunchpad({
     programId: PROGRAM, mintA: mint.publicKey, decimals: 6, name, symbol, uri, migrateType: 'cpmm',
     configId: CONFIG, configInfo: cfg, mintBDecimals: 9, platformId: PLATFORM, txVersion: R.TxVersion.LEGACY,
@@ -75,13 +76,11 @@ async function build(req) {
   });
   // add the 0-SOL note to the fl00r tag to the first transaction, then sign for the new mint
   const { blockhash } = await conn.getLatestBlockhash('confirmed');
-  const out = transactions.map((tx, i) => {
-    const t = new Transaction(); t.add(...tx.instructions);
-    if (i === 0) t.add(SystemProgram.transfer({ fromPubkey: wallet, toPubkey: TAG, lamports: 0 }));
-    t.feePayer = wallet; t.recentBlockhash = blockhash;
-    if (t.instructions.some(ix => ix.keys.some(k => k.isSigner && k.pubkey.equals(mint.publicKey)))) t.partialSign(mint);
-    return t;
-  });
+  const tagIx = withMint => { const ix = SystemProgram.transfer({ fromPubkey: wallet, toPubkey: TAG, lamports: 0 }); if (withMint) ix.keys.push({ pubkey: mint.publicKey, isSigner: false, isWritable: false }); return ix; };
+  const mk = ixs => { const t = new Transaction(); t.add(...ixs); t.feePayer = wallet; t.recentBlockhash = blockhash; if (t.instructions.some(ix => ix.keys.some(k => k.isSigner && k.pubkey.equals(mint.publicKey)))) t.partialSign(mint); return t; };
+  const fits = t => { try { t.serialize({ requireAllSignatures: false, verifySignatures: false }); return true; } catch { return false; } };
+  let out = transactions.map((tx, i) => mk(i === 0 ? [...tx.instructions, tagIx(false)] : tx.instructions));
+  if (!fits(out[0])) { out = transactions.map(tx => mk(tx.instructions)); out.push(mk([tagIx(true)])); }   // no room: the 0-SOL note goes in its own small transaction after the launch
   let sim = null;
   if (b.simulate) sim = await Promise.all(out.slice(0, 1).map(async v => { const r = await conn.simulateTransaction(v); return { err: r.value.err, units: r.value.unitsConsumed, logs: (r.value.logs || []).slice(-14) }; }));
   const pool = extInfo && extInfo.address && extInfo.address.poolId ? extInfo.address.poolId.toBase58() : R.getPdaLaunchpadPoolId(PROGRAM, mint.publicKey, WSOL).publicKey.toBase58();
@@ -104,7 +103,12 @@ async function coins() {
   const ok = sigs.filter(s => !s.err).map(s => s.signature);
   const txs = [];
   for (let i = 0; i < ok.length; i += 20) txs.push(...await Promise.all(ok.slice(i, i + 20).map(s => conn.getTransaction(s, { maxSupportedTransactionVersion: 0 }).catch(() => null))));
-  const mints = [...new Set(txs.filter(Boolean).map(t => { const keys = t.transaction.message.staticAccountKeys || t.transaction.message.accountKeys; return t.transaction.message.header.numRequiredSignatures >= 2 ? keys[1].toBase58() : null; }).filter(Boolean))];
+  const mints = [...new Set(txs.filter(Boolean).map(t => {
+    const m = t.transaction.message, keys = m.staticAccountKeys || m.accountKeys, ti = keys.findIndex(k => k.equals(TAG));
+    const ix = (m.compiledInstructions || []).find(c => c.accountKeyIndexes.includes(ti) && keys[c.programIdIndex].equals(SystemProgram.programId));
+    if (ix && ix.accountKeyIndexes.length >= 3) return keys[ix.accountKeyIndexes[2]].toBase58();
+    return m.header.numRequiredSignatures >= 2 ? keys[1].toBase58() : null;
+  }).filter(Boolean))];
   if (!mints.length) return { coins: [] };
   const pools = mints.map(m => R.getPdaLaunchpadPoolId(PROGRAM, new PublicKey(m), WSOL).publicKey);
   const metas = mints.map(m => PublicKey.findProgramAddressSync([Buffer.from('metadata'), META_PROGRAM.toBuffer(), new PublicKey(m).toBuffer()], META_PROGRAM)[0]);
@@ -136,3 +140,4 @@ module.exports = async (req, res) => {
     return send(res, 404, { error: 'unknown action' });
   } catch (e) { return send(res, 400, { error: e.message || String(e) }); }
 };
+module.exports._test = { build, setCfg: v => { cfgCache = { t: Date.now() + 1e9, v }; }, conn };
