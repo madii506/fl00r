@@ -12,7 +12,7 @@ const buyShare = (M, sol) => VTOK * (1 - vSol(M) / (vSol(M) + sol)) / SUPPLY;
 const stdShare = sol => STD.vTok * (1 - STD.vSol / (STD.vSol + sol)) / SUPPLY;
 const STD_START = SUPPLY * STD.vSol / STD.vTok;               // ≈ 27.96 SOL
 const fromK = k => S.min * Math.pow(S.max / S.min, k / 1000), toK = M => Math.round(1000 * Math.log(M / S.min) / Math.log(S.max / S.min));
-const fmtN = (n, d = 2) => n >= 1e9 ? (n / 1e9).toFixed(d) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 1 : d) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + 'K' : n.toFixed(n >= 100 ? 0 : 1);
+const trim = x => x.replace(/\.0+$|(\.\d*?)0+$/, '$1'); const fmtN = n => n >= 1e9 ? trim((n / 1e9).toFixed(2)) + 'B' : n >= 1e6 ? trim((n / 1e6).toFixed(n >= 1e7 ? 1 : 2)) + 'M' : n >= 1e3 ? trim((n / 1e3).toFixed(n >= 1e5 ? 0 : 1)) + 'K' : trim(n.toFixed(n >= 100 ? 0 : 1));
 const usd = sol => S.sol ? '$' + fmtN(sol * S.sol) : fmtN(sol) + ' SOL';
 const sol = n => (n >= 1000 ? Math.round(n).toLocaleString('en-US') : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' SOL';
 const pct = x => x >= .1 ? (x * 100).toFixed(1) + '%' : x >= .01 ? (x * 100).toFixed(2) + '%' : (x * 100).toFixed(3) + '%';
@@ -165,7 +165,7 @@ async function status() {
     const s = await statusP; S.status = s; if (s.solUsd) S.sol = s.solUsd;
     if (s.minStartSol) S.min = s.minStartSol;
     $('#solPx').textContent = S.sol ? '$' + S.sol.toFixed(2) : '—'; $('#llState').textContent = s.launchlab ? 'live' : 'unreachable';
-    if (s.tradeFeePct != null) $('#feeLine').textContent = s.tradeFeePct + '% per trade';
+    if (s.tradeFeePct != null) $('#feeLine').textContent = `${+(s.tradeFeePct + (s.platformFeePct || 0) + (s.creatorFeePct || 0)).toFixed(2)}% per trade (${s.tradeFeePct}% LaunchLab, ${s.platformFeePct}% platform, ${s.creatorFeePct}% to the creator)`;
     if (s.lpRule) $('#lpRule').textContent = s.lpRule; if (s.tag) $('#tagAddr').textContent = 'tag ' + s.tag;
   } catch (e) { $('#llState').textContent = 'offline'; $('#lpRule').textContent = 'could not read the platform right now'; }
   ranges.forEach(r => { r.value = toK(S.start); paintRange(r); }); buildTower(); renderAll();
